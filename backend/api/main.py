@@ -13,7 +13,7 @@ def health():
     return {"status": "ok"}
 
 @app.get("/debug/eth-test")
-def eth_test(address: str = "0xd8dA6BF26964af9D7eEd9e03E53415D37aA96045"):
+def eth_test(address: str = "0x59aAB1bd0d26290274398c07b55955c15425e16B"):
     adapter = EthAdapter()
     txs = adapter.fetch_transactions(address)
     return txs[0] if txs else {"error": "no transactions found"}

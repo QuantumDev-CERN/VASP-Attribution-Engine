@@ -8,12 +8,13 @@ from backend.api.schemas import NormalizedTransaction
 
 load_dotenv()
 API_KEY = os.getenv("ETHERSCAN_API_KEY")
-BASE_URL = "https://api.etherscan.io/api"
+BASE_URL = "https://api.etherscan.io/v2/api"
 
 
 class EthAdapter(BaseChainAdapter):
     def fetch_transactions(self, address: str) -> list[NormalizedTransaction]:
         params = {
+            "chainid":"1",
             "module": "account",
             "action": "txlist",
             "address": address,
@@ -24,6 +25,12 @@ class EthAdapter(BaseChainAdapter):
         }
         resp = requests.get(BASE_URL, params=params, timeout=15)
         resp.raise_for_status()
+        data = resp.json()
+
+        if data.get("status") == "0":
+            error_message = data.get("result", "Unknown error")
+            print(f"Error fetching transactions for address {address}: {error_message}")
+            return []
         raw_txs = resp.json().get("result", [])
         return [self._normalize(tx) for tx in raw_txs]
 
@@ -45,7 +52,7 @@ class EthAdapter(BaseChainAdapter):
 
 if __name__ == "__main__":
     # quick smoke test — swap for demo_case.json address once Teammate 1 delivers it
-    test_address = "0xd8dA6BF26964af9D7eEd9e03E53415D37aA96045"
+    test_address = "0x59aAB1bd0d26290274398c07b55955c15425e16B"
     adapter = EthAdapter()
     txs = adapter.fetch_transactions(test_address)
     if txs:
