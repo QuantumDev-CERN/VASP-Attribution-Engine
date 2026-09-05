@@ -131,7 +131,7 @@ class EthAdapter(BaseChainAdapter):
                 value=float(out_amount),
                 token=f"unresolved-erc20:{swap_data.get('dex_version')}",
                 token_contract=swap_data.get("pool_or_pair_address"),
-                timestamp=datetime.datetime.utcfromtimestamp(int(raw_tx["timeStamp"])),
+                timestamp=datetime.datetime.fromtimestamp(int(raw_tx["timeStamp"]), datetime.timezone.utc),
                 block_number=int(raw_tx["blockNumber"]),
                 tx_type_raw=TxTypeRaw.swap_event,
                 gas_used=float(raw_tx["gasUsed"]) if raw_tx.get("gasUsed") else None,
